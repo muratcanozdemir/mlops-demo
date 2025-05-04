@@ -23,32 +23,32 @@ jobs:
 
       - name: Ensure Python + DVC
         run: |
-          if ! command -v python3 &> /dev/null; then
-            apt-get update && apt-get install -y python3 python3-pip
-          fi
-          pip3 install --upgrade pip
-          pip3 install dvc[s3] minio
-          - name: Create MinIO bucket (if missing)
-          run: |
-            python3 - <<EOF
-            from minio import Minio
-            import os
-  
-            client = Minio(
-                os.environ["MINIO_ENDPOINT"].replace("http://", "").replace("https://", ""),
-                access_key=os.environ["MINIO_ACCESS_KEY"],
-                secret_key=os.environ["MINIO_SECRET_KEY"],
-                secure=False
-            )
-      
-            bucket = "mlops-dvc-storage"
-            if not client.bucket_exists(bucket):
-                client.make_bucket(bucket)
-                print(f"✅ Created bucket: {bucket}")
-            else:
-                print(f"✅ Bucket already exists: {bucket}")
-            EOF
-  
+          python3 -m venv .venv
+          source .venv/bin/activate
+          pip install --upgrade pip
+          pip install dvc[s3] minio
+        shell: bash
+      - name: Create MinIO bucket (if missing)
+        run: |
+          python3 - <<EOF
+          from minio import Minio
+          import os
+
+          client = Minio(
+              os.environ["MINIO_ENDPOINT"].replace("http://", "").replace("https://", ""),
+              access_key=os.environ["MINIO_ACCESS_KEY"],
+              secret_key=os.environ["MINIO_SECRET_KEY"],
+              secure=False
+          )
+    
+          bucket = "mlops-dvc-storage"
+          if not client.bucket_exists(bucket):
+              client.make_bucket(bucket)
+              print(f"✅ Created bucket: {bucket}")
+          else:
+              print(f"✅ Bucket already exists: {bucket}")
+          EOF
+
       - name: Configure DVC dynamically
         run: |
           dvc remote add -d minio-store s3://mlops-dvc-storage/
@@ -59,7 +59,9 @@ jobs:
           dvc remote modify minio-store use_ssl false
       
       - name: Try a dvc push now
-        run: dvc push
+        run: |
+          source .venv/bin/activate
+          dvc push
       # - name: Print system info
       #   run: uname -a
 
