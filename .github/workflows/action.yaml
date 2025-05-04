@@ -30,6 +30,7 @@ jobs:
         shell: bash
       - name: Create MinIO bucket (if missing)
         run: |
+          source .venv/bin/activate
           python3 - <<EOF
           from minio import Minio
           import os
