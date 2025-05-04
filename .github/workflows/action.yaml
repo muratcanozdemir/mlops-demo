@@ -45,6 +45,7 @@ jobs:
       - name: Configure DVC dynamically
         run: |
           source .venv/bin/activate
+          dvc init --no-scm 
           dvc remote add -d minio-store s3://mlops-dvc-storage/
           dvc remote modify minio-store endpointurl $MINIO_ENDPOINT
           dvc remote modify minio-store access_key_id $MINIO_ACCESS_KEY
