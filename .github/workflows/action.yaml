@@ -18,17 +18,59 @@ jobs:
     name: Testing the pipeline
     runs-on: ["self-hosted", "Linux", "X64", "k8s"]
     steps:
-      - name: Print system info
-        run: uname -a
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - name: Show disk space
-        run: df -h
+      - name: Ensure Python + DVC
+        run: |
+          if ! command -v python3 &> /dev/null; then
+            apt-get update && apt-get install -y python3 python3-pip
+          fi
+          pip3 install --upgrade pip
+          pip3 install dvc[s3] minio
+          - name: Create MinIO bucket (if missing)
+          run: |
+            python3 - <<EOF
+            from minio import Minio
+            import os
+  
+            client = Minio(
+                os.environ["MINIO_ENDPOINT"].replace("http://", "").replace("https://", ""),
+                access_key=os.environ["MINIO_ACCESS_KEY"],
+                secret_key=os.environ["MINIO_SECRET_KEY"],
+                secure=False
+            )
+      
+            bucket = "mlops-dvc-storage"
+            if not client.bucket_exists(bucket):
+                client.make_bucket(bucket)
+                print(f"✅ Created bucket: {bucket}")
+            else:
+                print(f"✅ Bucket already exists: {bucket}")
+            EOF
+  
+      - name: Configure DVC dynamically
+        run: |
+          dvc remote add -d minio-store s3://mlops-dvc-storage/
+          dvc remote modify minio-store endpointurl $MINIO_ENDPOINT
+          dvc remote modify minio-store access_key_id $MINIO_ACCESS_KEY
+          dvc remote modify minio-store secret_access_key $MINIO_SECRET_KEY
+          dvc remote modify minio-store region us-east-1
+          dvc remote modify minio-store use_ssl false
+      
+      - name: Try a dvc push now
+        run: dvc push
+      # - name: Print system info
+      #   run: uname -a
 
-      - name: Test networking
-        run: curl -I https://google.com || true
+      # - name: Show disk space
+      #   run: df -h
 
-      - name: Success mark
-        run: echo "✅ Runner is working correctly"
+      # - name: Test networking
+      #   run: curl -I https://google.com || true
+
+      # - name: Success mark
+      #   run: echo "✅ Runner is working correctly"
 
     # runs-on: ubuntu-latest
     # steps:
