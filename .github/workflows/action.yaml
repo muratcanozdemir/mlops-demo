@@ -39,6 +39,7 @@ jobs:
               os.environ["MINIO_ENDPOINT"].replace("http://", "").replace("https://", ""),
               access_key=os.environ["MINIO_ACCESS_KEY"],
               secret_key=os.environ["MINIO_SECRET_KEY"],
+              region="eu-central-1"
               secure=False
           )
     
@@ -56,7 +57,7 @@ jobs:
           dvc remote modify minio-store endpointurl $MINIO_ENDPOINT
           dvc remote modify minio-store access_key_id $MINIO_ACCESS_KEY
           dvc remote modify minio-store secret_access_key $MINIO_SECRET_KEY
-          dvc remote modify minio-store region us-east-1
+          dvc remote modify minio-store region eu-central-1
           dvc remote modify minio-store use_ssl false
       
       - name: Try a dvc push now
