@@ -39,7 +39,7 @@ jobs:
               os.environ["MINIO_ENDPOINT"].replace("http://", "").replace("https://", ""),
               access_key=os.environ["MINIO_ACCESS_KEY"],
               secret_key=os.environ["MINIO_SECRET_KEY"],
-              region="eu-central-1"
+              region="eu-central-1",
               secure=False
           )
     
