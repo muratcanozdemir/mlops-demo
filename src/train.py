@@ -10,10 +10,6 @@ import joblib
 import os
 import sys
 
-# Ensure outputs directory exists
-output_dir = sys.argv[2]
-os.makedirs(output_dir, exist_ok=True)
-
 input_path = sys.argv[1]
 df = pd.read_csv(input_path)
 X = df.drop(columns=["target"])
