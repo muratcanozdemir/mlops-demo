@@ -5,9 +5,9 @@ process TrainModel {
     path 'data/model_ready/'
 
     output:
-    path 'outputs/predictions.csv'
-    path 'outputs/model.pkl'
-    path 'outputs/metrics.json'
+    path 'predictions.csv'
+    path 'model.pkl'
+    path 'metrics.json'
 
     publishDir 'outputs', mode: 'copy'
 
