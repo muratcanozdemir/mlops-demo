@@ -7,6 +7,8 @@ from sklearn.model_selection import train_test_split
 
 import json
 import joblib
+import os
+import sys
 
 # Ensure outputs directory exists
 output_dir = os.path.join(sys.argv[2], "outputs")
