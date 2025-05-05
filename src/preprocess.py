@@ -1,5 +1,7 @@
 import os
 import pandas as pd
+import re
+import numpy as np
 
 def extract_hours(s):
     # Find a number (including decimals)
