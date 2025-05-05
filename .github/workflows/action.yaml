@@ -57,6 +57,29 @@ jobs:
         run: |
           source .venv/bin/activate
           dvc push
+          
+      - name: Inject Kaggle API token
+        run: |
+          mkdir -p ~/.kaggle
+          echo "${KAGGLE_TOKEN_JSON}" > ~/.kaggle/kaggle.json
+          chmod 600 ~/.kaggle/kaggle.json
+        env:
+          KAGGLE_TOKEN_JSON: ${{ secrets.KAGGLE_TOKEN_JSON }}
+
+      - name: Configure and run DVC pipeline
+        run: |
+          source .venv/bin/activate
+          git init  # only if your runner mounts a fresh volume
+          dvc init
+          dvc repro
+          echo "✅ DVC pipeline ran successfully."
+
+      - name: Push tracked data to MinIO
+        if: success()
+        run: |
+          source .venv/bin/activate
+          dvc push
+
       # - name: Print system info
       #   run: uname -a
 

@@ -1,0 +1,36 @@
+stages:
+  download:
+    cmd: bash src/download.sh
+    outs:
+      - data/raw/
+
+  preprocess:
+    cmd: python src/preprocess.py
+    deps:
+      - data/raw/
+    outs:
+      - data/processed/
+
+  feature-extract:
+    cmd: python src/feature_extract.py
+    deps:
+      - data/processed/
+    outs:
+      - data/model_ready/
+
+  train:
+    cmd: nextflow run nf/train.nf -with-trace
+    deps:
+      - data/model_ready/
+      - nf/train.nf
+    outs:
+      - outputs/predictions.csv
+      - outputs/model.pkl
+      - outputs/metrics.json
+
+  report:
+    cmd: python src/make_report.py
+    deps:
+      - outputs/metrics.json
+    outs:
+      - report.md
