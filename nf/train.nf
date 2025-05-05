@@ -10,12 +10,12 @@ process TrainModel {
     path 'predictions.csv'
     path 'model.pkl'
 
-    publishDir "${projectDir}/outputs", mode: 'copy'
+    publishDir "${workflow.projectDir}/outputs", mode: 'copy'
 
     script:
     """
     pip install scikit-learn joblib
-    python ${projectDir}/src/train.py ${model_input} .
+    python ${workflow.projectDir}/src/train.py ${model_input} .
     echo '✅ Contents of sandbox after train.py:'
     ls -lh
     """
