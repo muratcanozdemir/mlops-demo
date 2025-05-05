@@ -65,3 +65,6 @@ joblib.dump({
     "model": log_model,
     "scaler": scaler
 }, "model.pkl")
+
+import os
+print("Files in current dir:", os.listdir("."))
