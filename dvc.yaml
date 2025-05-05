@@ -24,7 +24,7 @@ stages:
       nextflow run train.nf -with-trace nflogs/trace.txt -with-report nflogs/report.html
     deps:
       - data/model_ready/
-      - nf/train.nf
+      - train.nf
     outs:
       - outputs/
 
