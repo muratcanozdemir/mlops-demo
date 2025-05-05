@@ -77,6 +77,9 @@ jobs:
           rm -rf .nextflow* work/ outputs/
           dvc repro
           echo "✅ DVC pipeline ran successfully."
+          git add dvc.lock
+          git commit -m "Auto-generated dvc.lock from CI"
+          git push
 
       - name: Push tracked data to MinIO
         if: success()

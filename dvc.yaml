@@ -12,7 +12,7 @@ stages:
       - data/preprocessed/
 
   feature-extract:
-    cmd: python src/feature_extract.py && cat dvc.lock
+    cmd: python src/feature_extract.py
     deps:
       - data/preprocessed/
     outs:
