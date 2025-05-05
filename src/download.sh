@@ -11,4 +11,4 @@ curl -L -o raw/student-depression-dataset.zip \
 unzip -o raw/student-depression-dataset.zip -d raw
 
 cd ..
-ls -la
+ls -la data
