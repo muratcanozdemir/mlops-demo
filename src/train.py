@@ -10,7 +10,7 @@ import joblib
 
 # Ensure outputs directory exists
 
-data = pd.read_csv("data/preprocessed/student_depression_dataset_model_ready.csv")
+data = pd.read_csv("data/model_ready/student_depression_dataset_model_ready.csv")
 X = df.drop(columns=["target"])
 y = df["target"]
 
