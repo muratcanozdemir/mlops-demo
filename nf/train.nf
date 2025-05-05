@@ -13,11 +13,10 @@ process TrainModel {
 
     script:
     """
-    mkdir -p outputs
-    echo 'id,prediction' > outputs/predictions.csv
-    echo '1,0.85' >> outputs/predictions.csv
-    echo 'model_parameters_placeholder' > outputs/model.pkl
-    echo '{"accuracy": 0.85}' > outputs/metrics.json
+    echo 'id,prediction' > predictions.csv
+    echo '1,0.85' >> predictions.csv
+    echo 'model_parameters_placeholder' > model.pkl
+    echo '{"accuracy": 0.85}' > metrics.json
     """
 }
 
