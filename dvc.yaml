@@ -33,4 +33,4 @@ stages:
     deps:
       - outputs/metrics.json
     outs:
-      - report.md
+      - Report.MD
