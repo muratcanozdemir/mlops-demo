@@ -3,7 +3,7 @@ import pandas as pd
 from pathlib import Path
 
 
-data = pd.read_csv("data/preprocessed/student_depression_dataset_rocessed.csv")
+data = pd.read_csv("data/preprocessed/student_depression_dataset_processed.csv")
 # Served its purpose in the reporting section, don't need for model training
 if 'Total Pressure' in data.columns:
     data.drop(columns=['Total Pressure'], inplace=True)
