@@ -9,12 +9,12 @@ stages:
     deps:
       - data/raw/
     outs:
-      - data/processed/
+      - data/preprocessed/
 
   feature-extract:
     cmd: python src/feature_extract.py
     deps:
-      - data/processed/
+      - data/preprocessed/
     outs:
       - data/model_ready/
 
