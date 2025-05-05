@@ -16,6 +16,7 @@ process TrainModel {
     script:
     """
     mkdir -p outputs
+    pip install scikit-learn joblib
     python train.py ${model_input} outputs
     """
 }
