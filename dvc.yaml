@@ -5,7 +5,7 @@ stages:
       - data/raw/
 
   preprocess:
-    cmd: source .venv/bin/activate && pip install pandas && python src/preprocess.py
+    cmd: pip install pandas && python src/preprocess.py
     deps:
       - data/raw/
     outs:
