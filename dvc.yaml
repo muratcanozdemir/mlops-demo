@@ -5,7 +5,7 @@ stages:
       - data/raw/
 
   preprocess:
-    cmd: python src/preprocess.py
+    cmd: pwd && python src/preprocess.py
     deps:
       - data/raw/
     outs:

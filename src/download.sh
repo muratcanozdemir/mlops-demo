@@ -12,3 +12,4 @@ unzip -o raw/student-depression-dataset.zip -d raw
 
 cd ..
 ls -la data
+pwd
