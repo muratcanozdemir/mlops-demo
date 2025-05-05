@@ -9,6 +9,8 @@ process TrainModel {
     path 'outputs/model.pkl'
     path 'outputs/metrics.json'
 
+    publishDir 'outputs', mode: 'copy'
+
     script:
     """
     mkdir -p outputs
