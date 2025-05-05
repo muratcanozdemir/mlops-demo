@@ -69,8 +69,6 @@ jobs:
       - name: Configure and run DVC pipeline
         run: |
           source .venv/bin/activate
-          git init  # only if your runner mounts a fresh volume
-          dvc init
           dvc repro
           echo "✅ DVC pipeline ran successfully."
 
