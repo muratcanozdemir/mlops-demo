@@ -22,7 +22,7 @@ y = df["target"]
 scaler = StandardScaler()
 num_feats = ['Age', 'Academic Pressure', 'Work Pressure', 'CGPA', 
              'Study Satisfaction', 'Job Satisfaction', 'Sleep Duration', 
-             'Work/Study Hours', 'Total Pressure']
+             'Work/Study Hours']
 X[num_feats] = scaler.fit_transform(X[num_feats])
 
 print("Feature matrix shape:", X.shape)
