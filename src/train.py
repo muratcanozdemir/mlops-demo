@@ -15,7 +15,7 @@ output_dir = os.path.join(sys.argv[2], "outputs")
 os.makedirs(output_dir, exist_ok=True)
 
 input_path = sys.argv[1]
-data = pd.read_csv(input_path)
+df = pd.read_csv(input_path)
 X = df.drop(columns=["target"])
 y = df["target"]
 
