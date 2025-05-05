@@ -19,7 +19,27 @@ stages:
       - data/model_ready/
 
   train:
-    cmd: nextflow run nf/train.nf -with-trace outputs/trace.txt -with-report outputs/report.html && ls -l outputs/
+    cmd: |
+      nextflow run nf/train.nf -with-trace outputs/trace.txt -with-report outputs/report.html &&\
+      ls -l outputs/ && \
+      echo "🔍 Dumping latest Nextflow work directory info"
+
+      latest_work_dir=$(find work/ -type f -name ".command.sh" -printf '%T@ %p\n' \
+        | sort -n | tail -1 | cut -d' ' -f2 | xargs dirname)
+
+      echo "📁 Latest work dir: $latest_work_dir"
+      echo "📜 Command script:"
+      cat "$latest_work_dir/.command.sh"
+
+      echo "📤 Command stdout:"
+      cat "$latest_work_dir/.command.out"
+
+      echo "📥 Command stderr:"
+      cat "$latest_work_dir/.command.err"
+
+      echo "📦 Files in that directory:"
+      ls -lh "$latest_work_dir"
+
     deps:
       - data/model_ready/
       - nf/train.nf
