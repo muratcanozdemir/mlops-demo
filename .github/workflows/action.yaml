@@ -21,13 +21,18 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Ensure Python + DVC
+      - name: Ensure Python + DVC + Nextflow
         run: |
           python3 -m venv .venv
           source .venv/bin/activate
           pip install --upgrade pip
           pip install dvc[s3]
-        
+
+          apt-get update && apt-get install -y openjdk-17-jre
+          curl -s https://get.nextflow.io | bash
+          chmod +x nextflow
+          mv nextflow /usr/local/bin/
+
       - name: Create MinIO bucket (if missing)
         run: |
           curl -sLO https://dl.min.io/client/mc/release/linux-amd64/mc
