@@ -26,5 +26,5 @@ workflow {
     model_input = Channel.fromPath('data/model_ready/student_depression_dataset_model_ready.csv')
 
     // Execute training
-    TrainModel(model_input, train_script)
+    TrainModel(model_input)
 }
