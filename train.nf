@@ -16,8 +16,7 @@ process TrainModel {
     script:
     """
     pip install scikit-learn joblib
-    cp ${train_script} train.py
-    python train.py ${model_input} .
+    python ${train_script} ${model_input} .
     echo '✅ Contents of sandbox after train.py:'
     ls -lh
     """
