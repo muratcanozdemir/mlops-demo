@@ -44,10 +44,13 @@ report_dict["confusion_matrix"] = cm_log
 y_prob_log = log_model.predict_proba(X_test)[:,1]
 fpr, tpr, thresholds = roc_curve(y_test, y_prob_log)
 roc_auc_log = auc(fpr, tpr)
-report_dict["fpr"] = fpr
-report_dict["tpr"] = tpr
-report_dict["thresholds"] = thresholds
-report_dict["roc_auc_log"] = roc_auc_log
+
+report_dict["confusion_matrix"] = cm_log.tolist()
+report_dict["fpr"] = fpr.tolist()
+report_dict["tpr"] = tpr.tolist()
+report_dict["thresholds"] = thresholds.tolist()
+report_dict["roc_auc_log"] = float(roc_auc_log)
+
 
 with open(f"{output_dir}/metrics.json", "w") as f:
     json.dump(report_dict, f, indent=4)
@@ -57,7 +60,7 @@ pd.DataFrame({
     "y_true": y_test,
     "y_pred": y_pred_log,
     "y_prob": y_prob_log
-}).to_csv("f{output_dir}/predictions.csv", index=False)
+}).to_csv(f"{output_dir}/predictions.csv", index=False)
 
 # Save model + scaler
 joblib.dump({
