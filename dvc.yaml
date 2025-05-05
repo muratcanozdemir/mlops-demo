@@ -5,7 +5,7 @@ stages:
       - data/raw/
 
   preprocess:
-    cmd: pip install pandas && python src/preprocess.py
+    cmd: pip install pandas<3.0.0 && python src/preprocess.py
     deps:
       - data/raw/
     outs:
@@ -24,9 +24,7 @@ stages:
       - data/model_ready/
       - nf/train.nf
     outs:
-      - outputs/predictions.csv
-      - outputs/model.pkl
-      - outputs/metrics.json
+      - outputs/
 
   report:
     cmd: python src/make_report.py
