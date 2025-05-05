@@ -9,7 +9,7 @@ if 'Total Pressure' in data.columns:
     data.drop(columns=['Total Pressure'], inplace=True)
 
 # one-hot encoding for categoricals
-data_encoder.drop(columns=["id", "Depression"], inPlace=True)
+data_encoder = data.drop(columns=["id", "Depression"])
 cat_features = ['Gender', 'City', 'Profession', 'Degree', 
                 'Have you ever had suicidal thoughts ?', 'Family History of Mental Illness', 'Financial Stress']
 data_encoded = pd.get_dummies(data_encoder, columns=cat_features, drop_first=True)
