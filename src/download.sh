@@ -1,6 +1,6 @@
 #!/bin/bash
 mkdir -p data/raw && \
-mkdir -p data/processed && \
+mkdir -p data/preprocessed && \
 mkdir -p data/model_ready
 cd data &&
 curl -L -o raw/student-depression-dataset.zip\
