@@ -8,13 +8,14 @@ data = pd.read_csv("data/preprocessed/student_depression_dataset_processed.csv")
 if 'Total Pressure' in data.columns:
     data.drop(columns=['Total Pressure'], inplace=True)
 # one-hot encoding for categoricals
-cat_features = ['Gender', 'City', 'Profession', 'Degree', 
-                'Have you ever had suicidal thoughts ?', 'Family History of Mental Illness', 'Financial Stress']
-data_encoded = pd.get_dummies(data, columns=cat_features, drop_first=True)
 drop_cols = ['id', 'Depression', 'Have you ever had suicidal thoughts ?', 
              'Family History of Mental Illness', 'Gender', 'City', 
              'Profession', 'Degree', 'Financial Stress']
-data_encoded_clean = data_encoded.drop(columns=drop_cols)
+data_clean = data.drop(columns=drop_cols)
+cat_features = ['Gender', 'City', 'Profession', 'Degree', 
+                'Have you ever had suicidal thoughts ?', 'Family History of Mental Illness', 'Financial Stress']
+data_encoded = pd.get_dummies(data_clean, columns=cat_features, drop_first=True)
+
 print("Columns after encoding:", data_encoded.columns.tolist())
 
 # Define keys for the original categorical columns that were encoded
