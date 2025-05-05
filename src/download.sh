@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # Create necessary directories
-mkdir -p data/raw data/processed data/model_ready
+mkdir -p data/raw data/preprocessed data/model_ready
 
 # Download and extract the dataset
 cd data
