@@ -19,7 +19,7 @@ stages:
       - data/model_ready/
 
   train:
-    cmd: nextflow run nf/train.nf -with-trace outputs/trace.txt -with-report outputs/report.html
+    cmd: nextflow run nf/train.nf -with-trace outputs/trace.txt -with-report outputs/report.html && ls -l outputs/
     deps:
       - data/model_ready/
       - nf/train.nf
@@ -27,7 +27,7 @@ stages:
       - outputs/
 
   report:
-    cmd: ls outputs/ && python src/make_report.py
+    cmd: ls -l outputs/ && python src/make_report.py
     deps:
       - outputs/metrics.json
     outs:
