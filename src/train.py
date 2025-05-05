@@ -11,7 +11,7 @@ import os
 import sys
 
 # Ensure outputs directory exists
-output_dir = os.path.join(sys.argv[2], "outputs")
+output_dir = sys.argv[2]
 os.makedirs(output_dir, exist_ok=True)
 
 input_path = sys.argv[1]
@@ -52,18 +52,16 @@ report_dict["thresholds"] = thresholds.tolist()
 report_dict["roc_auc_log"] = float(roc_auc_log)
 
 
-with open(f"{output_dir}/metrics.json", "w") as f:
+with open("metrics.json", "w") as f:
     json.dump(report_dict, f, indent=4)
 
-# Save predictions
 pd.DataFrame({
     "y_true": y_test,
     "y_pred": y_pred_log,
     "y_prob": y_prob_log
-}).to_csv(f"{output_dir}/predictions.csv", index=False)
+}).to_csv("predictions.csv", index=False)
 
-# Save model + scaler
 joblib.dump({
     "model": log_model,
     "scaler": scaler
-}, f"{output_dir}/model.pkl")
+}, "model.pkl")

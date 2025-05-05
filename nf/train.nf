@@ -7,9 +7,9 @@ process TrainModel {
     path train_script       // Python script that runs training
 
     output:
-    path 'outputs/metrics.json'
-    path 'outputs/predictions.csv'
-    path 'outputs/model.pkl'
+    path 'metrics.json'
+    path 'predictions.csv'
+    path 'model.pkl'
 
     publishDir "${projectDir}/outputs", mode: 'copy'
 
