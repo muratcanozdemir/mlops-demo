@@ -2,9 +2,19 @@ import pandas as pd
 # Standardize numerical features
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import classification_report, confusion_matrix, roc_curve, auc
+from sklearn.model_selection import train_test_split
+
 import json
 import joblib
 
+# Ensure outputs directory exists
+
+data = pd.read_csv("data/preprocessed/student_depression_dataset_model_ready.csv")
+X = df.drop(columns=["target"])
+y = df["target"]
+
+os.makedirs("outputs", exist_ok=True)
 
 scaler = StandardScaler()
 num_feats = ['Age', 'Academic Pressure', 'Work Pressure', 'CGPA', 
@@ -38,6 +48,16 @@ report_dict["roc_auc_log"] = roc_auc_log
 
 with open("outputs/metrics.json", "w") as f:
     json.dump(report_dict, f, indent=4)
-joblib.dump(log_model, "outputs/model.pkl")
-with open("outputs/predictions.csv", "w") as f:
-    json.dump(y_pred_log)
+
+# Save predictions
+pd.DataFrame({
+    "y_true": y_test,
+    "y_pred": y_pred_log,
+    "y_prob": y_prob_log
+}).to_csv("outputs/predictions.csv", index=False)
+
+# Save model + scaler
+joblib.dump({
+    "model": log_model,
+    "scaler": scaler
+}, "outputs/model.pkl")

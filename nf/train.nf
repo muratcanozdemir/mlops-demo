@@ -2,24 +2,20 @@
 
 process TrainModel {
     input:
-    path 'data/model_ready/'
+    path 'data/model_ready/student_depression_dataset_model_ready.csv'
 
     output:
-    path 'predictions.csv'
-    path 'model.pkl'
-    path 'metrics.json'
-
-    publishDir 'outputs', mode: 'copy'
+    path 'outputs/predictions.csv'
+    path 'outputs/model.pkl'
+    path 'outputs/metrics.json'
 
     script:
     """
-    echo 'id,prediction' > predictions.csv
-    echo '1,0.85' >> predictions.csv
-    echo 'model_parameters_placeholder' > model.pkl
-    echo '{"accuracy": 0.85}' > metrics.json
+    pip install scikit-learn joblib
+    python src/train.py
     """
 }
 
 workflow {
-    Channel.fromPath('data/model_ready/') | TrainModel
+    Channel.fromPath('data/model_ready/student_depression_dataset_model_ready.csv') | TrainModel
 }
