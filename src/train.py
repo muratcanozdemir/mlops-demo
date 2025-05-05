@@ -9,12 +9,13 @@ import json
 import joblib
 
 # Ensure outputs directory exists
+output_dir = os.path.join(sys.argv[2], "outputs")
+os.makedirs(output_dir, exist_ok=True)
 
-data = pd.read_csv("data/model_ready/student_depression_dataset_model_ready.csv")
+input_path = sys.argv[1]
+data = pd.read_csv(input_path)
 X = df.drop(columns=["target"])
 y = df["target"]
-
-os.makedirs("outputs", exist_ok=True)
 
 scaler = StandardScaler()
 num_feats = ['Age', 'Academic Pressure', 'Work Pressure', 'CGPA', 
@@ -46,7 +47,7 @@ report_dict["tpr"] = tpr
 report_dict["thresholds"] = thresholds
 report_dict["roc_auc_log"] = roc_auc_log
 
-with open("outputs/metrics.json", "w") as f:
+with open(f"{output_dir}/metrics.json", "w") as f:
     json.dump(report_dict, f, indent=4)
 
 # Save predictions
@@ -54,10 +55,10 @@ pd.DataFrame({
     "y_true": y_test,
     "y_pred": y_pred_log,
     "y_prob": y_prob_log
-}).to_csv("outputs/predictions.csv", index=False)
+}).to_csv("f{output_dir}/predictions.csv", index=False)
 
 # Save model + scaler
 joblib.dump({
     "model": log_model,
     "scaler": scaler
-}, "outputs/model.pkl")
+}, f"{output_dir}/model.pkl")

@@ -3,29 +3,28 @@ nextflow.enable.dsl=2
 
 process TrainModel {
     input:
-    path model_input
-    path train_script
+    path model_input        // CSV file from feature extraction
+    path train_script       // Python script that runs training
 
     output:
+    path 'outputs/metrics.json'
     path 'outputs/predictions.csv'
     path 'outputs/model.pkl'
-    path 'outputs/metrics.json'
+
+    publishDir "${projectDir}/outputs", mode: 'copy'
 
     script:
     """
-    ls -R .
-    pwd
-    pip install scikit-learn joblib
-    python train.py
+    mkdir -p outputs
+    python train.py ${model_input} outputs
     """
 }
 
 workflow {
-    Channel.fromPath('data/model_ready/student_depression_dataset_model_ready.csv')
-        .set { model_input }
+    // Input channels
+    model_input = Channel.fromPath('data/model_ready/student_depression_dataset_model_ready.csv')
+    train_script = Channel.fromPath('src/train.py')
 
-    Channel.fromPath('src/train.py')
-        .set { train_script }
-
+    // Execute training
     TrainModel(model_input, train_script)
 }
