@@ -2,7 +2,8 @@
 
 process TrainModel {
     input:
-    path 'data/model_ready/student_depression_dataset_model_ready.csv'
+    path model_input from 'data/model_ready/student_depression_dataset_model_ready.csv'
+    path train_script from 'src/train.py'
 
     output:
     path 'outputs/predictions.csv'
@@ -11,8 +12,10 @@ process TrainModel {
 
     script:
     """
+    ls -R .
+    pwd
     pip install scikit-learn joblib
-    python src/train.py
+    python train.py
     """
 }
 
