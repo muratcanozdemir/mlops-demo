@@ -19,7 +19,7 @@ stages:
       - data/model_ready/
 
   train:
-    cmd: nextflow run nf/train.nf -with-trace
+    cmd: nextflow run nf/train.nf -with-trace outputs/trace.txt -with-report outputs/report.html
     deps:
       - data/model_ready/
       - nf/train.nf

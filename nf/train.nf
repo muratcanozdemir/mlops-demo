@@ -1,9 +1,10 @@
 #!/usr/bin/env nextflow
+nextflow.enable.dsl=2
 
 process TrainModel {
     input:
-    path model_input from 'data/model_ready/student_depression_dataset_model_ready.csv'
-    path train_script from 'src/train.py'
+    path model_input
+    path train_script
 
     output:
     path 'outputs/predictions.csv'
@@ -20,5 +21,11 @@ process TrainModel {
 }
 
 workflow {
-    Channel.fromPath('data/model_ready/student_depression_dataset_model_ready.csv') | TrainModel
+    Channel.fromPath('data/model_ready/student_depression_dataset_model_ready.csv')
+        .set { model_input }
+
+    Channel.fromPath('src/train.py')
+        .set { train_script }
+
+    TrainModel(model_input, train_script)
 }
