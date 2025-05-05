@@ -20,7 +20,10 @@ stages:
 
   train:
     cmd: |
-      nextflow run nf/train.nf -with-trace outputs/trace.txt -with-report outputs/report.html
+      mkdir -p .nflogs
+      nextflow run nf/train.nf -with-trace nflogs/trace.txt -with-report nflogs/report.html
+      ls -lh outputs/
+      ls -lh .nflogs/
 
     deps:
       - data/model_ready/
