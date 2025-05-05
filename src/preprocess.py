@@ -28,5 +28,5 @@ for col in ['Sleep Duration']:
 data['Total Pressure'] = data['Academic Pressure'] + data['Work Pressure']
 
 os.makedirs("data/preprocessed", exist_ok=True)
-df.to_csv("data/preprocessed/student_depression_dataset_processed.csv", index=False)
+data.to_csv("data/preprocessed/student_depression_dataset_processed.csv", index=False)
     
