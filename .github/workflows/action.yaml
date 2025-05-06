@@ -77,6 +77,8 @@ jobs:
           rm -rf .nextflow* work/ outputs/
           dvc repro
           echo "✅ DVC pipeline ran successfully."
+          git config --global user.email "you@example.com"
+          git config --global user.name "Your Name"
           git add dvc.lock
           git commit -m "Auto-generated dvc.lock from CI"
           git push
