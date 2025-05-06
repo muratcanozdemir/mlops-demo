@@ -2,10 +2,12 @@ name: MLOps Pipeline
 
 permissions:
   id-token: write
-  contents: read
+  contents: write
 
 env:
   team_name: "MLOps Rocks!"
+  GIT_USER_NAME: github-actions[bot]
+  GIT_USER_EMAIL: github-actions[bot]@users.noreply.github.com
 
 on:
   push:
@@ -77,82 +79,17 @@ jobs:
           rm -rf .nextflow* work/ outputs/
           dvc repro
           echo "✅ DVC pipeline ran successfully."
-          git config --global user.email "you@example.com"
-          git config --global user.name "Your Name"
+          git config --global user.name "$GIT_USER_NAME"
+          git config --global user.email "$GIT_USER_EMAIL"
           git add dvc.lock
           git commit -m "Auto-generated dvc.lock from CI"
-          git push
+          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/muratcanozdemir/mlops-demo
 
       - name: Push tracked data to MinIO
         if: success()
         run: |
           source .venv/bin/activate
           dvc push
-
-      # - name: Print system info
-      #   run: uname -a
-
-      # - name: Show disk space
-      #   run: df -h
-
-      # - name: Test networking
-      #   run: curl -I https://google.com || true
-
-      # - name: Success mark
-      #   run: echo "✅ Runner is working correctly"
-
-    # runs-on: ubuntu-latest
-    # steps:
-    #   - name: Record start time
-    #     run: echo "START_TIME=$(date +%s)" >> $GITHUB_ENV
-
-    #   - name: Checkout repository
-    #     uses: actions/checkout@v4
-
-    #   - name: Set up Python
-    #     uses: actions/setup-python@v5
-    #     with:
-    #       python-version: '3.10'
-
-    #   - name: Install MinIO client (mc)
-    #     run: |
-    #       curl -O https://dl.min.io/client/mc/release/linux-amd64/mc
-    #       chmod +x mc
-    #       sudo mv mc /usr/local/bin/
-
-    #   - name: Ensure that buckets exist
-    #     run: |
-    #       mc alias set localminio ${{ secrets.MINIO_ENDPOINT }} ${{ secrets.MINIO_ACCESS_KEY }} ${{ secrets.MINIO_SECRET_KEY }}
-    #       mc mb --ignore-existing localminio/dvc-bucket
-    #       mc mb --ignore-existing localminio/metadata-bucket
-  
-    #   - name: Install DVC and Nextflow
-    #     run: |
-    #       pip install dvc[s3]
-    #       curl -s https://get.nextflow.io | bash
-    #       sudo mv nextflow /usr/local/bin/
-
-    #   - name: Configure DVC remote (MinIO)
-    #     run: |
-    #       dvc remote add -f -d minioremote s3://dvc-bucket
-    #       dvc remote modify minioremote endpointurl ${{ secrets.MINIO_ENDPOINT }}
-    #       dvc remote modify minioremote access_key_id ${{ secrets.MINIO_ACCESS_KEY }}
-    #       dvc remote modify minioremote secret_access_key ${{ secrets.MINIO_SECRET_KEY }}
-
-    #   - name: DVC pull
-    #     run: |
-    #       dvc pull -j 8
-
-    #   - name: DVC repro (run Nextflow pipeline)
-    #     run: |
-    #       dvc repro
-      
-    #   - name: Record end time
-    #     run: echo "END_TIME=$(date +%s)" >> $GITHUB_ENV
-
-    #   - name: DVC push outputs
-    #     run: |
-    #       dvc push -j 8
 
     #   - name: Check if there are changes
     #     id: changes
