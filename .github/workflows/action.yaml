@@ -23,6 +23,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Capture start time
+        run: echo "START_TIME=$(date +%s)" >> $GITHUB_ENV
+
       - name: Ensure Python + DVC + Nextflow
         run: |
           python3 -m venv .venv
@@ -42,12 +45,8 @@ jobs:
           mv mc /usr/local/bin/
 
           mc alias set local "$MINIO_ENDPOINT" "$MINIO_ACCESS_KEY" "$MINIO_SECRET_KEY"
-          if ! mc ls local | grep -q mlops-dvc-storage; then
-            mc mb local/mlops-dvc-storage
-            echo "✅ Created bucket: mlops-dvc-storage"
-          else
-            echo "✅ Bucket already exists"
-          fi
+          mc ls local | grep -q mlops-dvc-storage || mc mb local/mlops-dvc-storage
+          echo "✅ Bucket ready"
 
       - name: Configure DVC dynamically
         run: |
@@ -79,69 +78,74 @@ jobs:
           rm -rf .nextflow* work/ outputs/
           dvc repro
           echo "✅ DVC pipeline ran successfully."
-          git config --global user.name "$GIT_USER_NAME"
-          git config --global user.email "$GIT_USER_EMAIL"
-          git add dvc.lock
-          git commit -m "Auto-generated dvc.lock from CI"
-          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/muratcanozdemir/mlops-demo
 
       - name: Push tracked data to MinIO
         if: success()
         run: |
           source .venv/bin/activate
           dvc push
+      - name: Check if there are DVC-tracked changes
+        id: check_changes
+        run: |
+          source .venv/bin/activate
+          if git diff --exit-code dvc.lock; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+          fi
 
-    #   - name: Check if there are changes
-    #     id: changes
-    #     run: |
-    #       git diff --exit-code || echo "changes=true" >> $GITHUB_ENV
+      - name: Commit and tag if DVC.lock changed
+        if: steps.check_changes.outputs.changed == 'true'
+        run: |
+          git config user.name "$GIT_USER_NAME"
+          git config user.email "$GIT_USER_EMAIL"
+          git add dvc.lock
+          git commit -m "Update data artifacts [skip ci]"
+          TAG="data-v$(date +'%Y%m%d%H%M%S')"
+          git tag "$TAG"
+          git push origin main --tags
 
-    #   - name: Commit and tag if changes
-    #     if: ${{ env.changes }} == 'true'
-    #     run: |
-    #       git config user.name "github-actions[bot]"
-    #       git config user.email "github-actions[bot]@users.noreply.github.com"
-    #       git add cicd-demo/dvc-store/
-    #       git commit -m "Update data artifacts [skip ci]" || echo "No changes to commit"
-    #       git tag "data-v$(date +'%Y%m%d%H%M%S')"
-    #       git push origin main --tags
+      - name: Generate and upload metadata
+        if: success()
+        run: |
+          TIMESTAMP=$(date +'%Y-%m-%dT%H:%M:%S')
+          GIT_HASH=$(git rev-parse HEAD)
+          VERSION_TAG=$(git describe --tags --abbrev=0 || echo 'untagged')
+          PIPELINE_NAME="${{ github.workflow }}"
+          END_TIME=$(date +%s)
+          RUN_DURATION=$(( END_TIME - START_TIME ))
 
-    #   - name: Generate and upload metadata
-    #     run: |
-    #       TIMESTAMP=$(date +'%Y-%m-%dT%H:%M:%S')
-    #       GIT_HASH=$(git rev-parse HEAD)
-    #       VERSION_TAG=$(git describe --tags --abbrev=0 || echo 'untagged')
-    #       PIPELINE_NAME=${{ github.workflow }}
-    #       RUN_DURATION=$(( $END_TIME - $START_TIME ))
-    #       echo "Pipeline duration: ${RUN_DURATION} seconds"
-    #       cat <<EOF > metadata.json
-    #       {
-    #         "timestamp": "$TIMESTAMP",
-    #         "git_commit": "$GIT_HASH",
-    #         "dataset_version": "$VERSION_TAG",
-    #         "pipeline_name": "$PIPELINE_NAME",
-    #         "run_duration_seconds": $RUN_DURATION,
-    #         "team_name": ${{ env.team_name }}
-    #       }
-    #       EOF
-    #       mc alias set localminio ${{ secrets.MINIO_ENDPOINT }} ${{ secrets.MINIO_ACCESS_KEY }} ${{ secrets.MINIO_SECRET_KEY }}
-    #       mc cp metadata.json localminio/metadata-bucket/metadata-$TIMESTAMP.json
-      
-    #   - name: Upload Nextflow artifacts to MinIO
-    #     run: |
-    #       mc alias set localminio ${{ secrets.MINIO_ENDPOINT }} ${{ secrets.MINIO_ACCESS_KEY }} ${{ secrets.MINIO_SECRET_KEY }}
-    #       mc mb --ignore-existing localminio/dvc-bucket
-    #       mc cp pipeline_report.html localminio/dvc-bucket/artifacts/pipeline_report-$(date +'%Y%m%d%H%M%S').html
-    #       mc cp pipeline_timeline.html localminio/dvc-bucket/artifacts/pipeline_timeline-$(date +'%Y%m%d%H%M%S').html
-    #       mc cp pipeline_trace.txt localminio/dvc-bucket/artifacts/pipeline_trace-$(date +'%Y%m%d%H%M%S').txt
+          cat <<EOF > metadata.json
+          {
+            "timestamp": "$TIMESTAMP",
+            "git_commit": "$GIT_HASH",
+            "dataset_version": "$VERSION_TAG",
+            "pipeline_name": "$PIPELINE_NAME",
+            "run_duration_seconds": $RUN_DURATION,
+            "team_name": "${{ env.team_name }}"
+          }
+          EOF
 
-          
-    #   - name: Index metadata into Elasticsearch
-    #     if: success()
-    #     run: |
-    #       curl -XPOST "${{ secrets.ELK_ENDPOINT }}/mlops-metadata/_doc" \
-    #         -H 'Content-Type: application/json' \
-    #         --data-binary @metadata.json
+          mc alias set localminio "$minioUrl" "$minioUser" "$minioPassword"
+          mc cp metadata.json localminio/metadata-bucket/metadata-$TIMESTAMP.json
+
+      - name: Upload Nextflow artifacts to MinIO
+        if: success()
+        run: |
+          mc alias set localminio "$minioUrl" "$minioUser" "$minioPassword"
+          mc mb --ignore-existing localminio/dvc-bucket
+          for f in pipeline_report.html pipeline_timeline.html pipeline_trace.txt; do
+            if [[ -f "$f" ]]; then
+              mc cp "$f" localminio/dvc-bucket/artifacts/"${f%.*}-$(date +'%Y%m%d%H%M%S').${f##*.}"
+            fi
+          done
+
+      - name: Index metadata into Elasticsearch
+        if: success()
+        run: |
+          curl -XPOST "${elasticsearchUrl}/mlops-metadata/_doc" \
+            -H 'Content-Type: application/json' \
+            --data-binary @metadata.json
 
     #   - name: Send success email
     #     if: success()
