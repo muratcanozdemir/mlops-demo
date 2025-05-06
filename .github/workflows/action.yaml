@@ -8,6 +8,10 @@ env:
   team_name: "MLOps Rocks!"
   GIT_USER_NAME: github-actions[bot]
   GIT_USER_EMAIL: github-actions[bot]@users.noreply.github.com
+  MINIO_ENDPOINT: ${{ secrets.minioUrl }}
+  MINIO_ACCESS_KEY: ${{ secrets.minioUser }}
+  MINIO_SECRET_KEY: ${{ secrets.minioPassword }}
+  ELK_ENDPOINT: ${{ secrets.elasticsearchUrl }}
 
 on:
   push:
