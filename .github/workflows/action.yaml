@@ -145,7 +145,7 @@ jobs:
       - name: Index metadata into Elasticsearch
         if: success()
         run: |
-          curl -XPOST 'http://'"$ES_DEMO_ES_INTERNAL_HTTP_SERVICE"':9200/mlops-metadata/_doc'\
+          curl -XPOST 'http://10.109.21.53:9200/mlops-metadata/_doc'\
             -H 'Content-Type: application/json' \
             --data-binary @metadata.json
 
