@@ -126,13 +126,13 @@ jobs:
           }
           EOF
 
-          mc alias set localminio "$minioUrl" "$minioUser" "$minioPassword"
+          mc alias set local "$MINIO_ENDPOINT" "$MINIO_ACCESS_KEY" "$MINIO_SECRET_KEY"
           mc cp metadata.json localminio/metadata-bucket/metadata-$TIMESTAMP.json
 
       - name: Upload Nextflow artifacts to MinIO
         if: success()
         run: |
-          mc alias set localminio "$minioUrl" "$minioUser" "$minioPassword"
+          mc alias set local "$MINIO_ENDPOINT" "$MINIO_ACCESS_KEY" "$MINIO_SECRET_KEY"
           mc mb --ignore-existing localminio/dvc-bucket
           for f in pipeline_report.html pipeline_timeline.html pipeline_trace.txt; do
             if [[ -f "$f" ]]; then
@@ -143,7 +143,7 @@ jobs:
       - name: Index metadata into Elasticsearch
         if: success()
         run: |
-          curl -XPOST "${elasticsearchUrl}/mlops-metadata/_doc" \
+          curl -XPOST "${ES_DEMO_ES_INTERNAL_HTTP_SERVICE}:9200/mlops-metadata/_doc" \
             -H 'Content-Type: application/json' \
             --data-binary @metadata.json
 
