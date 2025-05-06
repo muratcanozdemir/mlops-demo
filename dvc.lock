@@ -1,0 +1,69 @@
+schema: '2.0'
+stages:
+  download:
+    cmd: bash src/download.sh
+    outs:
+    - path: data/raw/
+      hash: md5
+      md5: 1ce2ec48c982f741506979da001887cf.dir
+      size: 3370587
+      nfiles: 2
+  preprocess:
+    cmd: pip install pandas && python src/preprocess.py
+    deps:
+    - path: data/raw/
+      hash: md5
+      md5: 1ce2ec48c982f741506979da001887cf.dir
+      size: 3370587
+      nfiles: 2
+    outs:
+    - path: data/preprocessed/
+      hash: md5
+      md5: 64fe193e5f444486bbcc95d1d6b0ee7b.dir
+      size: 2649334
+      nfiles: 1
+  feature-extract:
+    cmd: python src/feature_extract.py
+    deps:
+    - path: data/preprocessed/
+      hash: md5
+      md5: 64fe193e5f444486bbcc95d1d6b0ee7b.dir
+      size: 2649334
+      nfiles: 1
+    outs:
+    - path: data/model_ready/
+      hash: md5
+      md5: ed5808977e2d8dae5a972780a6f7c5b4.dir
+      size: 17922122
+      nfiles: 1
+  train:
+    cmd: "mkdir -p .nflogs\nnextflow run train.nf -with-trace nflogs/trace.txt -with-report
+      nflogs/report.html\n"
+    deps:
+    - path: data/model_ready/
+      hash: md5
+      md5: ed5808977e2d8dae5a972780a6f7c5b4.dir
+      size: 17922122
+      nfiles: 1
+    - path: train.nf
+      hash: md5
+      md5: be536e66258845efce43695effc962d3
+      size: 738
+    outs:
+    - path: outputs/
+      hash: md5
+      md5: 2bbab16e9137a6e1e6d42fafa519037d.dir
+      size: 244788
+      nfiles: 3
+  report:
+    cmd: ls -l outputs/ && python src/make_report.py
+    deps:
+    - path: outputs/metrics.json
+      hash: md5
+      md5: 2bab04e7e5df2a050b98ef5116944b33
+      size: 109972
+    outs:
+    - path: Report.MD
+      hash: md5
+      md5: e7e5e4a8689c806362eca1cc4c75fd02
+      size: 40
