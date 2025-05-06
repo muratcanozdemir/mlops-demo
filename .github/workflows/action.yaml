@@ -78,7 +78,6 @@ jobs:
           rm -rf .nextflow* work/ outputs/
           dvc repro
           echo "✅ DVC pipeline ran successfully."
-          cat outputs/metrics.json
 
       - name: Push tracked data to MinIO
         if: success()
@@ -145,7 +144,7 @@ jobs:
       - name: Index metadata into Elasticsearch
         if: success()
         run: |
-          curl -k -XPOST 'https://10.109.21.53:9200/mlops-metadata/_doc'\
+          curl -k -u elastic:${{ secrets.ES }} -XPOST 'https://10.109.21.53:9200/mlops-metadata/_doc'\
             -H 'Content-Type: application/json' \
             --data-binary @metadata.json
 
